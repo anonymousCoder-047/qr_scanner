@@ -1,0 +1,206 @@
+
+<%- include('partials/headers') %> 
+
+<%- include('partials/navbar', { 'isLoggedin':isLoggedin, 'admin':admin }) %>
+
+<body>
+    <!-- Prealoader -->
+    <div id="preloader-wrapper">
+        <div class="preloader loading">
+            <span class="slice"></span>
+            <span class="slice"></span>
+            <span class="slice"></span>
+            <span class="slice"></span>
+            <span class="slice"></span>
+            <span class="slice"></span>
+          </div>
+    </div>
+    <!-- Prealoader -->
+
+    <!-- Section -->
+    <section id="main-content" class="uk-section uk-section-default hidden">
+        <h1>Hello <%= user_name %>!</h1>
+        <% if( admin === true ) { %>
+            <div id="alert_display" style="display: none;">
+                <div id="alert_color" class="uk-alert-primary" uk-alert>
+                    <a class="uk-alert-close" uk-close></a>
+                    <p id="alert_message"></p>
+                </div>
+            </div>
+            <div class="uk-child-width-1-3@m uk-grid-small uk-grid-match" uk-grid>
+                <div>
+                    <div class="uk-card uk-card-default uk-card-body">
+                        <h3 class="uk-card-title">Users</h3>
+                        <p><i class="fa fa-users"></i> <%= users.length ? users.length : 0 %></p>
+                    </div>
+                </div>
+            </div>
+        <% } else { %>
+            <div id="alert_display" style="display: none;">
+                <div id="alert_color" class="uk-alert-primary" uk-alert>
+                    <a class="uk-alert-close" uk-close></a>
+                    <p id="alert_message"></p>
+                </div>
+            </div>
+            <div class="uk-child-width-1-3@m uk-grid-small uk-grid-match" uk-grid>
+                <div>
+                    <div class="uk-card uk-card-default uk-card-body">
+                        <h3 class="uk-card-title"><i class="fa fa-bank"></i> Wallet</h3>
+                        <p><i class="fa fa-inr"></i> <%= data.wallet ? data.wallet : 0 %></p>
+                    </div>
+                </div>
+                <div>
+                    <div class="uk-card uk-card-primary uk-card-body">
+                        <h3 class="uk-card-title"><i class="fa fa-inr"></i> Balance</h3>
+                        <p><i class="fa fa-inr"></i> <%= data.wallet ? data.wallet : 0 %></p>
+                    </div>
+                </div>
+                <div>
+                    <div class="uk-card uk-card-secondary uk-card-body">
+                        <h3 class="uk-card-title">Last Transaction</h3>
+                        <span><i class="fa fa-inr"> <%= data.transaction ? data.transaction : 0 %></i></span>
+                    </div>
+                </div>
+            </div>
+        <% } %>
+        
+        <!-- This is the container of the content items -->
+        
+        <% if( admin === false ) { %>
+            <div class="uk-section">
+                <div style="margin-left: 35px;" class="uk-child-width-1-1" uk-grid>
+                    <ul class="uk-subnav uk-subnav-pill" uk-switcher="animation: uk-animation-fade">
+                        <li><a href="#">Profile</a></li>
+                        <li><a href="#">Orders</a></li>
+                        <li><a href="#">Transactions</a></li>
+                    </ul>
+                    
+                    <ul class="uk-switcher uk-margin">
+                        <li>
+                            <table class="uk-table uk-table-divider">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                </tr>
+                                <tr>
+                                    <td><%= user_name %></td>
+                                    <td><%= data.user_email %></td>
+                                </tr>
+                            </table>
+                        </li>
+                        <li><%= data.orders %></li>
+                        <li><%= data.transaction %></li>
+                    </ul>
+                </div>
+            </div>
+        <% } else { %>
+            <div class="uk-section">
+                <div style="margin-left: 35px;" class="uk-child-width-1-1" uk-grid>
+                    <ul class="uk-subnav uk-subnav-pill" uk-switcher="animation: uk-animation-fade">
+                        <li><a href="#">Users</a></li>
+                        <li><a href="#">add points</a></li>
+                    </ul>
+                    
+                    <ul class="uk-switcher uk-margin">
+                        <li>
+                            <table class="uk-table uk-table-divider">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                </tr>
+                                <% for( let i=0; i< users.length; i++ ) { %>
+                                    <tr>
+                                        <td><%= users[i].usr_name %></td>
+                                        <td><%= users[i].usr_email %></td>
+                                    </tr>
+                                <% } %>
+                            </table>
+                        </li>
+                        <li>
+                            <table class="uk-table uk-table-divider">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Add Points</th>
+                                </tr>
+                                <% for( let i=0; i< users.length; i++ ) { %>
+                                    <tr>
+                                        <td id="user_name_<%=i+1%>"><%= users[i].usr_name %></td>
+                                        <td><%= users[i].usr_email %></td>
+                                        <td><span><input type="number" name="wallet_points" class="uk-input" onchange="wallet_points_added(this, '<%=i+1%>')" value="<%=users[i].wallet ? users[i].wallet : 0%>" id="wallet_points"></span></td>
+                                    </tr>
+                                <% } %>
+                            </table>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        <% } %>
+    </section>
+    <!-- Section -->
+
+    <script>
+        function wallet_points_added(ele, id) {
+            let alert_display = document.getElementById('alert_display');
+            let alert_color = document.getElementById('alert_color');
+            let alert_message = document.getElementById('alert_message');
+            let user_id = 'user_name_'+id;
+            let wallet_points = document.getElementById(ele.id).value;
+            let user_name = document.getElementById(user_id).innerHTML;
+
+            if( ele.value = '' && ele.value < 0 ) {
+                alert_display.style.display = 'block';
+                alert_color.classList.toggle('uk-alert-danger');
+                alert_message.innerHTML = "Please Enter Positive Numbers Only";
+                
+                setTimeout(() => {
+                    alert_display.style.display = 'none';
+                    alert_color.classList.toggle('uk-alert-danger');
+                    alert_message.innerHTML = "Please Enter Positive Numbers Only";
+                    M.toast({ html: "Please Enter Valid Numbers" });
+                }, 2000);
+            } else {
+                $.post('/dashboard/wallet', { "user_name":user_name, "wallet_points":wallet_points }).then((data, textStatus) => {
+                    if( data == 'APP_ERROR' ) {
+                        alert_display.style.display = 'block';
+                        alert_color.classList.toggle('uk-alert-danger');
+                        alert_message.innerHTML = "Sorry Server Error! Please Try Again Later";
+                        
+                        setTimeout(() => {
+                            alert_display.style.display = 'none';
+                            alert_color.classList.toggle('uk-alert-danger');
+                            alert_message.innerHTML = "Sorry Server Error! Please Try Again Later";
+                            M.toast({ html: "Server Error" });
+                        }, 2000);
+                    } else if( data == 'DATA_ERROR') {
+                        alert_display.style.display = 'block';
+                        alert_color.classList.toggle('uk-alert-danger');
+                        alert_message.innerHTML = "User Not Found!";
+                        
+                        setTimeout(() => {
+                            alert_display.style.display = 'none';
+                            alert_color.classList.toggle('uk-alert-danger');
+                            alert_message.innerHTML = "User Not Found!";
+                            M.toast({ html: "User Not Found!" });
+                        }, 2000);
+                    } else if(data == 'SUCCESSFULL') {
+                        alert_display.style.display = 'block';
+                        alert_color.classList.toggle('uk-alert-success');
+                        alert_message.innerHTML = "Points Added Successfully";
+                        
+                        setTimeout(() => {
+                            alert_display.style.display = 'none';
+                            alert_color.classList.toggle('uk-alert-danger');
+                            alert_message.innerHTML = "Points Added Successfully";
+                            M.toast({ html: "Points Added Successfully!" });
+                            location.reload();
+                        }, 2000);
+                    }
+                });
+            }
+        }
+    </script>
+
+</body>
+
+<%- include('partials/footer') %>
